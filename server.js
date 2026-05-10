@@ -20,3 +20,8 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log('Server running on port ' + PORT);
 });
+const db = require('./db');
+
+db.query('SELECT 1')
+  .then(() => console.log('✅ Database connected successfully!'))
+  .catch(err => console.log('❌ Database connection failed:', err.message));
