@@ -16,6 +16,16 @@ app.get('/', (req, res) => {
   res.json({ status: 'Z-Network API is running' });
 });
 
+app.get('/test-db', async (req, res) => {
+  const db = require('./db');
+  try {
+    const [rows] = await db.query('SELECT COUNT(*) as count FROM vouchers');
+    res.json({ vouchers_in_db: rows[0].count });
+  } catch (err) {
+    res.json({ error: err.message });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log('Server running on port ' + PORT);
