@@ -85,8 +85,8 @@ function getPlanFromAmount(amount) {
     350:  'daily',
     500:  'twoday',
     1000: 'halfweek',
-    1500: 'weekly',
-    5000: 'monthly'
+    2000: 'weekly',
+    6000: 'monthly'
   };
   return map[amount] || null;
 }
