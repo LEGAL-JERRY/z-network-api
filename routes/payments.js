@@ -9,3 +9,4 @@ router.get('/success', ctrl.handleSuccess);
 router.post('/verify-payment', ctrl.verifyPayment);
 
 module.exports = router;
+router.get('/check-expiry', ctrl.checkExpiry);
