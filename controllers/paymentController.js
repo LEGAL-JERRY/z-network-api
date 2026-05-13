@@ -56,11 +56,13 @@ exports.handleSuccess = async (req, res) => {
       [ref, voucher.id]
     );
 
-    await db.query(
-      `INSERT INTO payments (reference, amount, plan_key, status, voucher_code)
-       VALUES (?, ?, ?, 'success', ?)`,
-      [ref, amountPaid, planKey, voucher.code]
-    );
+    const expiresAt = getExpiryDate(planKey);
+
+      await db.query(
+        `INSERT INTO payments (reference, amount, plan_key, status, voucher_code, expires_at)
+        VALUES (?, ?, ?, 'success', ?, ?)`,
+        [ref, amountPaid, planKey, voucher.code, expiresAt]
+      );
 
     return res.json({
       status: 'success',
@@ -90,3 +92,70 @@ function getPlanFromAmount(amount) {
   };
   return map[amount] || null;
 }
+function getExpiryDate(planKey) {
+  const now = new Date();
+  const days = {
+    'daily':    1,
+    'twoday':   2,
+    'halfweek': 3.5,
+    'weekly':   7,
+    'monthly':  30
+  };
+  const planDays = days[planKey] || 1;
+  now.setTime(now.getTime() + planDays * 24 * 60 * 60 * 1000);
+  return now;
+}
+function getExpiryDate(planKey) {
+  const now = new Date();
+  const days = {
+    'daily':    1,
+    'twoday':   2,
+    'halfweek': 3.5,
+    'weekly':   7,
+    'monthly':  30
+  };
+  const planDays = days[planKey] || 1;
+  now.setTime(now.getTime() + planDays * 24 * 60 * 60 * 1000);
+  return now;
+}
+
+exports.checkExpiry = async (req, res) => {
+  const { voucher } = req.query;
+
+  if (!voucher) {
+    return res.json({ valid: false, reason: 'no_voucher' });
+  }
+
+  try {
+    const [rows] = await db.query(
+      'SELECT expires_at FROM payments WHERE voucher_code = ? AND status = "success"',
+      [voucher]
+    );
+
+    if (rows.length === 0) {
+      return res.json({ valid: false, reason: 'not_found' });
+    }
+
+    const expiresAt = new Date(rows[0].expires_at);
+    const now = new Date();
+
+    if (now > expiresAt) {
+      return res.json({ valid: false, reason: 'expired' });
+    }
+
+    const remainingMs = expiresAt - now;
+    const remainingHours = Math.floor(remainingMs / 3600000);
+    const remainingMins = Math.floor((remainingMs % 3600000) / 60000);
+
+    return res.json({
+      valid: true,
+      expires_at: expiresAt,
+      remaining_hours: remainingHours,
+      remaining_minutes: remainingMins
+    });
+
+  } catch (err) {
+    console.error('checkExpiry error:', err.message);
+    return res.status(500).json({ valid: true, reason: 'server_error' });
+  }
+};
