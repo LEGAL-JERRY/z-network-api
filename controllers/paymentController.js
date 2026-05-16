@@ -115,7 +115,7 @@ exports.checkExpiry = async (req, res) => {
 
   try {
     const [rows] = await db.query(
-      'SELECT expires_at FROM payments WHERE voucher_code = ? AND status = "success"',
+      "SELECT expires_at FROM payments WHERE voucher_code = ? AND status = 'success'",
       [voucher]
     );
 
