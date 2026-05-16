@@ -155,7 +155,7 @@ exports.checkExpiry = async (req, res) => {
     });
 
   } catch (err) {
-    console.error('checkExpiry error:', err.message);
+    console.error('checkExpiry error:', error.message, error.stack);
     return res.status(500).json({ valid: true, reason: 'server_error' });
   }
 };
