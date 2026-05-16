@@ -105,19 +105,6 @@ function getExpiryDate(planKey) {
   now.setTime(now.getTime() + planDays * 24 * 60 * 60 * 1000);
   return now;
 }
-function getExpiryDate(planKey) {
-  const now = new Date();
-  const days = {
-    'daily':    1,
-    'twoday':   2,
-    'halfweek': 3.5,
-    'weekly':   7,
-    'monthly':  30
-  };
-  const planDays = days[planKey] || 1;
-  now.setTime(now.getTime() + planDays * 24 * 60 * 60 * 1000);
-  return now;
-}
 
 exports.checkExpiry = async (req, res) => {
   const { voucher } = req.query;
@@ -155,7 +142,7 @@ exports.checkExpiry = async (req, res) => {
     });
 
   } catch (err) {
-    console.error('checkExpiry error:', error.message, error.stack);
-    return res.status(500).json({ valid: true, reason: 'server_error' });
+    console.error('checkExpiry FULL ERROR:', err.message, err.stack);
+    return res.status(500).json({ valid: false, reason: 'server_error', error: err.message });
   }
 };
