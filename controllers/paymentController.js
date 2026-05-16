@@ -41,7 +41,7 @@ exports.handleSuccess = async (req, res) => {
     }
 
     const [vouchers] = await db.query(
-      'SELECT * FROM vouchers WHERE plan_key = ? AND status = "unused" LIMIT 1',
+    "SELECT * FROM vouchers WHERE plan_key = ? AND status = 'unused' LIMIT 1"
       [planKey]
     );
 
