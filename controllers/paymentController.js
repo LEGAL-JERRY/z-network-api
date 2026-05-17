@@ -51,18 +51,17 @@ exports.handleSuccess = async (req, res) => {
 
     const voucher = vouchers[0];
 
-    await db.query(
-      'UPDATE vouchers SET status="used", payment_reference=?, used_at=NOW() WHERE id=?',
-      [ref, voucher.id]
-    );
+  await db.query(
+  "UPDATE vouchers SET status='used', payment_reference=?, used_at=NOW() WHERE id=?",
+  [ref, voucher.id]
+);
 
  const expiresAt = getExpiryDate(planKey);
  const expiresAtStr = expiresAt.toISOString().slice(0, 19).replace('T', ' ');
 
 await db.query(
-  `INSERT INTO payments (reference, amount, plan_key, status, voucher_code, expires_at)
-  VALUES (?, ?, ?, 'success', ?, ?)`,
-  [ref, amountPaid, planKey, voucher.code, expiresAtStr]
+  "UPDATE vouchers SET status='used', payment_reference=?, used_at=NOW() WHERE id=?",
+  [ref, voucher.id]
 );
 
     return res.json({
