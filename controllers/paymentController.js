@@ -41,7 +41,7 @@ exports.handleSuccess = async (req, res) => {
     }
 
     const [vouchers] = await db.query(
-    "SELECT * FROM vouchers WHERE plan_key = ? AND status = 'unused' LIMIT 1"
+    "SELECT * FROM vouchers WHERE plan_key = ? AND status = 'unused' LIMIT 1",
       [planKey]
     );
 
@@ -56,13 +56,14 @@ exports.handleSuccess = async (req, res) => {
       [ref, voucher.id]
     );
 
-    const expiresAt = getExpiryDate(planKey);
+ const expiresAt = getExpiryDate(planKey);
+ const expiresAtStr = expiresAt.toISOString().slice(0, 19).replace('T', ' ');
 
-      await db.query(
-        `INSERT INTO payments (reference, amount, plan_key, status, voucher_code, expires_at)
-        VALUES (?, ?, ?, 'success', ?, ?)`,
-        [ref, amountPaid, planKey, voucher.code, expiresAt]
-      );
+await db.query(
+  `INSERT INTO payments (reference, amount, plan_key, status, voucher_code, expires_at)
+  VALUES (?, ?, ?, 'success', ?, ?)`,
+  [ref, amountPaid, planKey, voucher.code, expiresAtStr]
+);
 
     return res.json({
       status: 'success',
